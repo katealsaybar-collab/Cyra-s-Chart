@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyra's Birth Chart</title>
+<style>
+  :root {
+    --gold:#c9a84c; --gold-light:#e8d49a; --deep:#111008;
+    --parchment:#f5f0e8; --muted:#7a6e61; --rust:#8b3a2a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--deep);color:var(--parchment);
+    font-family:Georgia,'Times New Roman',serif;
+    min-height:100vh;
+  }
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+  .star{position:absolute;border-radius:50%;background:var(--gold-light);animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);}
+  @keyframes twinkle{0%,100%{opacity:var(--o,.3)}50%{opacity:1}}
+  .wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:48px 20px 100px;}
+
+  /* header */
+  header{text-align:center;margin-bottom:48px;}
+  .eyebrow{font-family:monospace;font-size:10px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
+  h1{font-size:clamp(2.2rem,8vw,3.6rem);font-weight:normal;letter-spacing:.04em;line-height:1.1;}
+  h1 em{font-style:italic;color:var(--gold-light);}
+  .birth-meta{font-family:monospace;font-size:10px;color:var(--muted);margin-top:12px;letter-spacing:.1em;}
+  .divider{width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:20px auto;}
+
+  /* section label */
+  .section-label{font-family:monospace;font-size:9px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;margin-bottom:16px;text-align:center;}
+
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-bottom:48px;}
+  @media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr);}}
+  .card{
+    background:rgba(201,168,76,.05);
+    border:1px solid rgba(201,168,76,.15);
+    padding:14px 16px;
+  }
+  .p-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .psym{font-size:1.3rem;color:var(--gold);width:20px;text-align:center;}
+  .pname{font-family:monospace;font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
+  .sign{font-size:1.05rem;color:var(--parchment);}
+  .house{font-family:monospace;font-size:8px;color:var(--muted);margin-top:2px;}
+  .blessed-tag{
+    display:block;
+    background:rgba(201,168,76,.12);
+    border:1px solid rgba(201,168,76,.35);
+    color:var(--gold-light);
+    font-family:monospace;font-size:7px;
+    letter-spacing:.1em;padding:3px 6px;
+    margin-top:6px;text-transform:uppercase;
+  }
+
+  /* reading */
+  .reading{border-top:1px solid rgba(201,168,76,.15);padding-top:40px;}
+  .block{margin-bottom:36px;padding-bottom:36px;border-bottom:1px solid rgba(201,168,76,.07);}
+  .block:last-child{border-bottom:none;}
+  .btitle{font-size:1.25rem;font-style:italic;color:var(--gold-light);margin-bottom:12px;line-height:1.3;}
+  .bbody{font-size:1rem;line-height:1.85;color:rgba(245,240,232,.83);}
+  .ornament{text-align:center;color:var(--gold);letter-spacing:.6em;margin:28px 0;opacity:.4;font-size:1rem;}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Natal Chart · Whole Sign System</div>
+    <h1>Cyra Jean<br><em>Cadenas</em></h1>
+    <div class="birth-meta">August 25, 2009 · 12:15 PM · Paranaque City, Philippines</div>
+    <div class="divider"></div>
+  </header>
+
+  <div class="section-label">Planetary Placements</div>
+  <div class="grid" id="grid"></div>
+
+  <div class="ornament">✦ ✦ ✦</div>
+
+  <div class="reading">
+    <div class="section-label">Where You Are Blessed</div>
+    <div id="reading"></div>
+  </div>
+
+</div>
+<script>
+// stars
+const st=document.getElementById('stars');
+for(let i=0;i<100;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()>.85?2:1;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--d:${2+Math.random()*4}s;--o:${.1+Math.random()*.5};--dl:${Math.random()*5}s`;
+  st.appendChild(s);
+}
+
+const placements=[
+  {planet:'Sun',     symbol:'☉',sign:'Virgo',      house:'10th', blessed:true,  why:'Conjunct MC · destiny'},
+  {planet:'Moon',    symbol:'☽',sign:'Scorpio',     house:'12th', blessed:true,  why:'Exact Trine Pluto'},
+  {planet:'Rising',  symbol:'↑',sign:'Sagittarius', house:'—',    blessed:true,  why:'Jupiter-ruled · big spirit'},
+  {planet:'Mercury', symbol:'☿',sign:'Virgo',       house:'10th', blessed:true,  why:'Domicile · sharp mind'},
+  {planet:'Venus',   symbol:'♀',sign:'Cancer',      house:'8th',  blessed:false},
+  {planet:'Mars',    symbol:'♂',sign:'Gemini',      house:'7th',  blessed:false},
+  {planet:'Jupiter', symbol:'♃',sign:'Aquarius',    house:'3rd',  blessed:true,  why:'Rules ASC · full power'},
+  {planet:'Saturn',  symbol:'♄',sign:'Virgo',       house:'10th', blessed:false},
+  {planet:'Uranus',  symbol:'♅',sign:'Pisces',      house:'4th',  blessed:false},
+  {planet:'Neptune', symbol:'♆',sign:'Aquarius',    house:'3rd',  blessed:false},
+  {planet:'Pluto',   symbol:'♇',sign:'Capricorn',   house:'2nd',  blessed:true,  why:'Trine Sun · transforms'},
+  {planet:'N. Node', symbol:'☊',sign:'Capricorn',   house:'2nd',  blessed:false},
+];
+
+const glyph={Aries:'♈',Taurus:'♉',Gemini:'♊',Cancer:'♋',Leo:'♌',Virgo:'♍',
+             Libra:'♎',Scorpio:'♏',Sagittarius:'♐',Capricorn:'♑',Aquarius:'♒',Pisces:'♓'};
+
+const grid=document.getElementById('grid');
+placements.forEach(p=>{
+  const d=document.createElement('div');d.className='card';
+  d.innerHTML=`
+    <div class="p-row">
+      <span class="psym">${p.symbol}</span>
+      <span class="pname">${p.planet}</span>
+    </div>
+    <div class="sign">${glyph[p.sign]||''} ${p.sign}</div>
+    <div class="house">House ${p.house}</div>
+    ${p.blessed?`<span class="blessed-tag">✦ Blessed · ${p.why}</span>`:''}
+  `;
+  grid.appendChild(d);
+});
+
+const blessings=[
+  {
+    title:'Sun + Mercury in Virgo, 10th House — The One Who\'s Built to Be Known',
+    body:'Having your Sun right at the top of your chart — in the 10th house — means you\'re someone the world is literally designed to notice. Not in a loud, "look at me" way, but in a quiet, undeniable way. You walk into a room and people can tell you\'re someone who takes things seriously. And with Mercury right there too (in its own sign, Virgo — which means it\'s operating at full power), your brain is one of your biggest gifts. You think clearly, you catch details others miss, and you express yourself in ways that actually make sense to people. This combo says: you\'re going to be recognized for how smart and capable you are. That\'s not a maybe. It\'s written in.'
+  },
+  {
+    title:'Jupiter in Aquarius, 3rd House — Ruling Your Rising',
+    body:'Your Rising sign is Sagittarius, and Sagittarius is ruled by Jupiter — which means Jupiter is basically the boss of how you show up in the world. And your Jupiter sits in the 3rd house of ideas, communication, and learning. Translation: the way you naturally present yourself to people is as someone curious, enthusiastic, and full of interesting things to say. You probably have a thing for learning new stuff, asking a lot of questions, or exploring ideas that feel bigger than your current world. That\'s not restlessness — that\'s your chart doing exactly what it was designed to do. The world opens up for you through knowledge and connection.'
+  },
+  {
+    title:'Moon in Scorpio, 12th House — You Feel Everything Deeply (Even When You Don\'t Show It)',
+    body:'This placement means your emotional world is deep, intense, and private. You probably feel things way more than people around you realize — and you don\'t always share that, which is fine. The 12th house is your inner sanctuary. Moon in Scorpio gives you an almost eerie ability to sense when something is off — with people, situations, dynamics. You just <i>know</i>. That kind of emotional intelligence is rare. It might feel like a lot right now, but as you grow, it becomes one of your most powerful tools. You don\'t just understand facts — you understand <i>people</i>.'
+  },
+  {
+    title:'Pluto Trine Sun — The One Who Comes Back Stronger',
+    body:'Pluto trines your Sun, and that\'s a big deal. It means that every time life throws something hard at you — and it will, because that\'s life — you don\'t just survive it, you come out of it more yourself than before. Pluto is the planet of transformation and depth, and when it works <i>with</i> your Sun (your core identity) instead of against it, it means hard things don\'t break you. They refine you. You\'re the type of person who goes through something difficult and comes out the other side with more clarity, more strength, and more understanding of who you actually are. That\'s a genuinely rare quality.'
+  }
+];
+
+const out=document.getElementById('reading');
+blessings.forEach(b=>{
+  const div=document.createElement('div');div.className='block';
+  div.innerHTML=`<div class="btitle">${b.title}</div><div class="bbody">${b.body}</div>`;
+  out.appendChild(div);
+});
+</script>
+</body>
+</html>
